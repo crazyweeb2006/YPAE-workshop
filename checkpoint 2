@@ -1,0 +1,67 @@
+import turtle
+import math
+
+# --- 1. Screen Setup ---
+screen = turtle.Screen()
+screen.setup(width=800, height=800)
+screen.bgcolor("black")
+screen.title("Simple Orbital Space Simulation")
+screen.tracer(0)  # Turns off auto-animation for smooth custom rendering
+
+# --- 2. Physics Constants ---
+G = 0.1  # Gravitational constant (scaled for the simulation)
+
+# --- 3. Celestial Bodies ---
+# The Star (Stationary mass at the center)
+star = turtle.Turtle()
+star.shape("circle")
+star.color("yellow")
+star.shapesize(2.5)  # Make it look big
+star.penup()
+star.goto(0, 0)
+star.mass = 10000
+
+# The Planet
+planet = turtle.Turtle()
+planet.shape("circle")
+planet.color("royalblue")
+planet.shapesize(0.8)
+planet.penup()
+planet.goto(250, 0)  # Initial starting position (distance from star)
+planet.pendown()     # Leaves a trail showing the orbit path
+planet.pencolor("gray")
+
+# Planet Initial Physics States
+planet.mass = 1
+planet.vx = 0        # Initial velocity along X axis
+planet.vy = 2.0      # Initial velocity along Y axis (tangential velocity)
+
+# --- 4. Main Simulation Loop ---
+while True:
+    # Calculate distance components between planet and star
+    dx = star.xcor() - planet.xcor()
+    dy = star.ycor() - planet.ycor()
+    distance = math.sqrt(dx**2 + dy**2)
+
+    # Prevent division by zero if they collide
+    if distance < 20:
+        break
+
+    # Calculate Gravitational Force: F = G * (m1 * m2) / r^2
+    force = (G * star.mass * planet.mass) / (distance**2)
+
+    # Calculate Acceleration components: a = F / m
+    # Direction is determined by the angle between them
+    angle = math.atan2(dy, dx)
+    ax = (force / planet.mass) * math.cos(angle)
+    ay = (force / planet.mass) * math.sin(angle)
+
+    # Update Planet Velocity (v = v + a)
+    planet.vx += ax
+    planet.vy += ay
+
+    # Update Planet Position (x = x + v)
+    planet.goto(planet.xcor() + planet.vx, planet.ycor() + planet.vy)
+
+    # Refresh the screen
+    screen.update()
